@@ -335,8 +335,8 @@ function generateQuestions(mode, chapter) {
                 // Fallback
             }
 
-            // Add Dokkai (photoTests) for bunpo_dokkai and combined modes
-            if ((mode === 'bunpo_dokkai' || mode === 'combined') && typeof photoTests !== 'undefined' && photoTests.length > 0) {
+            // Add Dokkai (photoTests) for bunpo_dokkai, combined, and study modes
+            if ((mode === 'bunpo_dokkai' || mode === 'combined' || mode === 'study') && typeof photoTests !== 'undefined' && photoTests.length > 0) {
                 // Get dokkai for current chapter (1-based index)
                 const chapterIndex = parseInt(chapter) - 1;
                 if (photoTests[chapterIndex]) {
