@@ -334,6 +334,20 @@ function generateQuestions(mode, chapter) {
             } else {
                 // Fallback
             }
+
+            // Add Dokkai (photoTests) for bunpo_dokkai and combined modes
+            if ((mode === 'bunpo_dokkai' || mode === 'combined') && typeof photoTests !== 'undefined' && photoTests.length > 0) {
+                // Get dokkai for current chapter (1-based index)
+                const chapterIndex = parseInt(chapter) - 1;
+                if (photoTests[chapterIndex]) {
+                    const d = photoTests[chapterIndex];
+                    questions.push({
+                        type: 'dokkai',
+                        image: d.image.replace('./dokkai_photo', 'data/dokkai_photo'),
+                        questions: d.questions.map((q, i) => ({ ...q, id: `dokkai_${chapterIndex}_${i}` }))
+                    });
+                }
+            }
         }
     }
 
