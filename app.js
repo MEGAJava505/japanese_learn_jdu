@@ -164,13 +164,22 @@ function setupTest() {
 
     // Render
     renderQuestions();
+
+    // Initial study display update
+    if (isStudyMode && currentMode === 'study') {
+        updateStudyDisplay();
+    }
+
     updateProgress();
 }
 
 // Update display based on study mode checkbox toggles
 function updateStudyDisplay() {
+    console.log('Updating Study Display...');
     const showGoi = toggleGoi ? toggleGoi.checked : true;
     const showBunpoDokkai = toggleBunpoDokkai ? toggleBunpoDokkai.checked : true;
+
+    console.log(`Goi: ${showGoi}, Bunpo/Dokkai: ${showBunpoDokkai}`);
 
     // Find all question sections and toggle visibility
     const allSections = document.querySelectorAll('.section-block');
@@ -188,14 +197,18 @@ function updateStudyDisplay() {
         } else if (isBunpoDokkai && !isGoi) {
             section.style.display = showBunpoDokkai ? '' : 'none';
         }
-        // If both or neither, show based on any checked
     });
 
-    // Also hide/show dokkai wrapper if exists
-    const dokkaiWrapper = document.querySelector('.dokkai-wrapper');
-    if (dokkaiWrapper) {
-        dokkaiWrapper.style.display = showBunpoDokkai ? '' : 'none';
-    }
+    // Also hide/show dokkai wrappers (extra safety)
+    const dokkaiWrappers = document.querySelectorAll('.dokkai-wrapper');
+    dokkaiWrappers.forEach(wrapper => {
+        // If wrapper is NOT inside a hidden section, we might need to toggle it manually?
+        // Actually, if the section is hidden, the wrapper is hidden.
+        // But if the wrapper is standalone (legacy?), toggle it.
+        // Generally safe to toggle based on BunpoDokkai flag if it's a dokkai wrapper.
+        if (wrapper.closest('.section-block')) return; // handled by section
+        wrapper.style.display = showBunpoDokkai ? '' : 'none';
+    });
 
     updateProgress();
 }
