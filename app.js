@@ -89,8 +89,24 @@ document.addEventListener('DOMContentLoaded', async () => {
 
     // Event Listeners
     finishBtn.addEventListener('click', finishTest);
-    if (toggleGoi) toggleGoi.addEventListener('change', updateStudyDisplay);
-    if (toggleBunpoDokkai) toggleBunpoDokkai.addEventListener('change', updateStudyDisplay);
+    // Re-query elements to ensure they exist
+    const tGoi = document.getElementById('toggleGoi');
+    const tBunpo = document.getElementById('toggleBunpoDokkai');
+
+    console.log("Re-queried toggles:", { tGoi, tBunpo });
+
+    if (tGoi) {
+        tGoi.addEventListener('change', (e) => {
+            console.log('GOI toggle changed:', e.target.checked);
+            updateStudyDisplay();
+        });
+    }
+    if (tBunpo) {
+        tBunpo.addEventListener('change', (e) => {
+            console.log('BUNPO toggle changed:', e.target.checked);
+            updateStudyDisplay();
+        });
+    }
 
     // Timer
     startTimer();
@@ -182,8 +198,17 @@ function setupTest() {
 // Update display based on study mode checkbox toggles
 function updateStudyDisplay() {
     console.log('Updating Study Display...');
-    const showGoi = toggleGoi ? toggleGoi.checked : true;
-    const showBunpoDokkai = toggleBunpoDokkai ? toggleBunpoDokkai.checked : true;
+
+    const tGoi = document.getElementById('toggleGoi');
+    const tBunpo = document.getElementById('toggleBunpoDokkai');
+
+    if (!tGoi || !tBunpo) {
+        console.error("Toggles not found in updateStudyDisplay!");
+        return;
+    }
+
+    const showGoi = tGoi.checked;
+    const showBunpoDokkai = tBunpo.checked;
 
     console.log(`Goi: ${showGoi}, Bunpo/Dokkai: ${showBunpoDokkai}`);
 

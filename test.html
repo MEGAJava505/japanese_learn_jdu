@@ -43,11 +43,13 @@
             <!-- Study Mode Toggles (Visible only in Study Mode) -->
             <div id="studyControls" class="controls" style="display: none; margin-top: 10px;">
                 <label class="toggle-label">
-                    <input type="checkbox" id="toggleGoi" checked class="toggle-checkbox">
+                    <input type="checkbox" id="toggleGoi" checked class="toggle-checkbox"
+                        onclick="updateStudyDisplay()">
                     <span>語彙 (GOI)</span>
                 </label>
                 <label class="toggle-label">
-                    <input type="checkbox" id="toggleBunpoDokkai" checked class="toggle-checkbox">
+                    <input type="checkbox" id="toggleBunpoDokkai" checked class="toggle-checkbox"
+                        onclick="updateStudyDisplay()">
                     <span>文法・読解 (BUNPO+DOKKAI)</span>
                 </label>
             </div>
