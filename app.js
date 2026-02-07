@@ -61,6 +61,12 @@ const QUESTIONS_PER_CHAPTER_GOI = 35; // Approx
 const QUESTIONS_PER_CHAPTER_BUNPO = 32; // Increased from 25
 
 document.addEventListener('DOMContentLoaded', async () => {
+    console.log("App initialized. Toggles found?", {
+        goi: !!toggleGoi,
+        bunpo: !!toggleBunpoDokkai,
+        studyControls: !!studyControls
+    });
+
     // Parse URL params
     const urlParams = new URLSearchParams(window.location.search);
     currentMode = urlParams.get('mode') || 'combined';
