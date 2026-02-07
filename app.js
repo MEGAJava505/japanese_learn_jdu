@@ -64,6 +64,13 @@ document.addEventListener('DOMContentLoaded', async () => {
     toggleGoi = document.getElementById('toggleGoi');
     toggleBunpoDokkai = document.getElementById('toggleBunpoDokkai');
 
+    // Check if we are on the test page
+    if (!questionList) {
+        // Not on test page (e.g. index.html)
+        // Theme logic is handled separately or by common code above
+        return;
+    }
+
     // Parse URL params
     const urlParams = new URLSearchParams(window.location.search);
     currentMode = urlParams.get('mode') || 'combined';
@@ -85,20 +92,17 @@ document.addEventListener('DOMContentLoaded', async () => {
     setupTest();
 
     // Event Listeners
-    finishBtn.addEventListener('click', finishTest);
-    // Re-query elements to ensure they exist
-    const tGoi = document.getElementById('toggleGoi');
-    const tBunpo = document.getElementById('toggleBunpoDokkai');
+    if (finishBtn) finishBtn.addEventListener('click', finishTest);
 
-
-
-    if (tGoi) {
-        tGoi.addEventListener('change', () => {
+    // Re-query elements to ensure they exist (though we just did)
+    // Actually, toggleGoi / Bunpo might be null if not study mode or not present
+    if (toggleGoi) {
+        toggleGoi.addEventListener('change', () => {
             updateStudyDisplay();
         });
     }
-    if (tBunpo) {
-        tBunpo.addEventListener('change', () => {
+    if (toggleBunpoDokkai) {
+        toggleBunpoDokkai.addEventListener('change', () => {
             updateStudyDisplay();
         });
     }
