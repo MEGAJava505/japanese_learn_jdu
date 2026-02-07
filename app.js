@@ -771,16 +771,7 @@ function exitDrill() {
     window.location.href = 'shiken_dokkai.html';
 }
 
-function updateStudyDisplay() {
-    const showGoi = toggleGoi.checked;
-    const showBunpo = toggleBunpoDokkai.checked;
 
-    const goiSec = document.getElementById('section-goi');
-    const bunpoSec = document.getElementById('section-bunpo-dokkai');
-
-    if (goiSec) goiSec.style.display = showGoi ? 'block' : 'none';
-    if (bunpoSec) bunpoSec.style.display = showBunpo ? 'block' : 'none';
-}
 
 function updateProgress() {
     let total = 0;
