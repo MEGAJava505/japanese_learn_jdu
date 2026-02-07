@@ -1,0 +1,101 @@
+<!DOCTYPE html>
+<html lang="ja">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>JLPT Test Mode</title>
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@300;400;500;700&display=swap"
+        rel="stylesheet">
+    <link rel="stylesheet" href="styles.css">
+    <script src="data/n2dokkai_script.js"></script>
+    <script src="data/drill_dokkai.js"></script>
+    <script src="data/n2questions.js"></script>
+    <script src="data/n2questions_structured.js"></script>
+    <!-- Use structured data if available -->
+    <!-- Note: n2dokkai_script.js defines 'photoTests'.
+         n2questions.js defines 'n2QuestionsData'.
+    -->
+</head>
+
+<body>
+    <div class="container">
+        <header>
+            <div style="display: flex; justify-content: space-between; align-items: center;">
+                <a href="index.html" class="btn btn-secondary">← Menu</a>
+                <h1 id="testTitle">Test Mode</h1>
+                <div style="display: flex; align-items: center; gap: 12px;">
+                    <a id="jishoLink" href="https://jisho.org" target="_blank"
+                        style="color:var(--primary-color); text-decoration:none; font-size:0.9em;">Jisho 🔍</a>
+                    <div class="timer" id="timerDisplay"></div>
+                    <button id="themeToggle" onclick="toggleTheme()" style="
+                        background: none; 
+                        border: 2px solid var(--primary-color); 
+                        border-radius: 50%; 
+                        width: 36px; 
+                        height: 36px; 
+                        cursor: pointer; 
+                        font-size: 1em;
+                    ">🌙</button>
+                </div>
+            </div>
+
+            <!-- Study Mode Toggles (Visible only in Study Mode) -->
+            <div id="studyControls" class="controls" style="display: none; margin-top: 10px;">
+                <label class="toggle-label">
+                    <input type="checkbox" id="toggleGoi" checked class="toggle-checkbox">
+                    <span>語彙 (GOI)</span>
+                </label>
+                <label class="toggle-label">
+                    <input type="checkbox" id="toggleBunpoDokkai" checked class="toggle-checkbox">
+                    <span>文法・読解 (BUNPO+DOKKAI)</span>
+                </label>
+            </div>
+        </header>
+
+        <main id="questionList" class="question-container">
+            <!-- Questions injected here -->
+            <div style="text-align: center; margin-top: 50px;">Loading questions...</div>
+        </main>
+
+        <div class="bottom-bar">
+            <div class="progress-info" id="progressInfo">0 / 0</div>
+            <button id="finishBtn" class="btn">Finish Test</button>
+        </div>
+    </div>
+
+    <!-- Results Modal -->
+    <div id="resultModal"
+        style="display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.8); align-items: center; justify-content: center; z-index: 1000;">
+        <div
+            style="background: var(--surface-color); padding: 40px; border-radius: 12px; text-align: center; max-width: 500px; width: 90%;">
+            <h2>Test Results</h2>
+            <p id="scoreDisplay"
+                style="font-size: 2rem; margin: 20px 0; font-weight: bold; color: var(--secondary-color);">Score: 0</p>
+            <div style="display: flex; gap: 10px; justify-content: center;">
+                <a href="index.html" class="btn">Back to Menu</a>
+                <button onclick="location.reload()" class="btn btn-secondary">Retry</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Furigana Helper Popup (simplified) -->
+    <div id="furiganaPopup" style="
+        display: none;
+        position: fixed;
+        background: rgba(255,255,255,0.98);
+        border: 1px solid #7c4dff;
+        border-radius: 8px;
+        padding: 10px 14px;
+        z-index: 2000;
+        box-shadow: 0 4px 20px rgba(0,0,0,0.15);
+        max-width: 280px;
+        pointer-events: none;
+    ">
+        <div id="furiganaContent" style="color: #212121; font-size: 1em;"></div>
+    </div>
+
+    <script src="app.js"></script>
+</body>
+
+</html>

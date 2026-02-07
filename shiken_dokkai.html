@@ -1,0 +1,180 @@
+<!DOCTYPE html>
+<html lang="ja">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Shiken Dokkai Menu</title>
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@300;400;500;700&display=swap"
+        rel="stylesheet">
+    <link rel="stylesheet" href="styles.css">
+</head>
+
+<body>
+    <div class="container">
+        <header>
+            <div style="display: flex; justify-content: space-between; align-items: flex-start;">
+                <a href="index.html"
+                    style="color: var(--primary-color); text-decoration: none; font-weight: bold;">&larr; Back</a>
+                <div style="text-align: center;">
+                    <h1>模擬読解 (Shiken Dokkai)</h1>
+                    <p>Select Reading Practice Mode</p>
+                </div>
+                <button id="themeToggle" onclick="toggleTheme()" style="
+                    background: none; 
+                    border: 2px solid var(--primary-color); 
+                    border-radius: 50%; 
+                    width: 40px; 
+                    height: 40px; 
+                    cursor: pointer; 
+                    font-size: 1.2em;
+                ">🌙</button>
+            </div>
+        </header>
+
+        <main>
+            <div class="menu-grid">
+                <!-- Random Dokkai -->
+                <div class="menu-card" style="padding: 0; overflow: hidden; border: 2px solid #2196F3;">
+                    <div style="padding: 15px; text-align: center; background: rgba(33,150,243,0.1);">
+                        <h3 style="margin: 0; color: #64B5F6;">ランダムドリル (Random)</h3>
+                        <p class="detail" style="margin: 5px 0 0 0;">10 Random Questions</p>
+                    </div>
+                    <div style="display: flex; height: 80px;">
+                        <button onclick="startTestMode('dokkai_drill', 'random', true)"
+                            style="flex:1; cursor:pointer; background:#4CAF50; color:white; border:none; font-size:1.3em; font-weight:bold;">Study</button>
+                        <button onclick="startTestMode('dokkai_drill', 'random', false)"
+                            style="flex:1; cursor:pointer; background:#2196F3; color:white; border:none; font-size:1.3em; font-weight:bold;">Test</button>
+                    </div>
+                </div>
+
+                <!-- Drill Book Section -->
+                <!-- Chapter 1 -->
+                <div class="menu-card drill-card" style="border-left: 5px solid #ff9800; padding: 0; overflow: hidden;">
+                    <div style="padding: 15px; text-align: center; background: rgba(255,152,0,0.1);">
+                        <h3 style="margin: 0;">1 内容理解　短文</h3>
+                        <p class="detail" style="margin: 5px 0 0 0;">Short Passages</p>
+                    </div>
+                    <div style="display: flex; height: 80px;">
+                        <button onclick="startTestMode('dokkai_drill', 1, true)"
+                            style="flex:1; cursor:pointer; background:#4CAF50; color:white; border:none; font-size:1.3em; font-weight:bold; transition: opacity 0.2s;">
+                            Study
+                        </button>
+                        <button onclick="startTestMode('dokkai_drill', 1, false)"
+                            style="flex:1; cursor:pointer; background:#FF9800; color:white; border:none; font-size:1.3em; font-weight:bold; transition: opacity 0.2s;">
+                            Test
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Chapter 2 -->
+                <div class="menu-card drill-card" style="border-left: 5px solid #ff9800; padding: 0; overflow: hidden;">
+                    <div style="padding: 15px; text-align: center; background: rgba(255,152,0,0.1);">
+                        <h3 style="margin: 0;">2 概要理解</h3>
+                        <p class="detail" style="margin: 5px 0 0 0;">Outline Understanding</p>
+                    </div>
+                    <div style="display: flex; height: 80px;">
+                        <button onclick="startTestMode('dokkai_drill', 2, true)"
+                            style="flex:1; cursor:pointer; background:#4CAF50; color:white; border:none; font-size:1.3em; font-weight:bold;">Study</button>
+                        <button onclick="startTestMode('dokkai_drill', 2, false)"
+                            style="flex:1; cursor:pointer; background:#FF9800; color:white; border:none; font-size:1.3em; font-weight:bold;">Test</button>
+                    </div>
+                </div>
+
+                <!-- Chapter 3 -->
+                <div class="menu-card drill-card" style="border-left: 5px solid #ff9800; padding: 0; overflow: hidden;">
+                    <div style="padding: 15px; text-align: center; background: rgba(255,152,0,0.1);">
+                        <h3 style="margin: 0;">3 内容理解　中文</h3>
+                        <p class="detail" style="margin: 5px 0 0 0;">Medium Passages</p>
+                    </div>
+                    <div style="display: flex; height: 80px;">
+                        <button onclick="startTestMode('dokkai_drill', 3, true)"
+                            style="flex:1; cursor:pointer; background:#4CAF50; color:white; border:none; font-size:1.3em; font-weight:bold;">Study</button>
+                        <button onclick="startTestMode('dokkai_drill', 3, false)"
+                            style="flex:1; cursor:pointer; background:#FF9800; color:white; border:none; font-size:1.3em; font-weight:bold;">Test</button>
+                    </div>
+                </div>
+
+                <!-- Chapter 4 -->
+                <div class="menu-card drill-card" style="border-left: 5px solid #ff9800; padding: 0; overflow: hidden;">
+                    <div style="padding: 15px; text-align: center; background: rgba(255,152,0,0.1);">
+                        <h3 style="margin: 0;">4 統合理解</h3>
+                        <p class="detail" style="margin: 5px 0 0 0;">Integrated Understanding</p>
+                    </div>
+                    <div style="display: flex; height: 80px;">
+                        <button onclick="startTestMode('dokkai_drill', 4, true)"
+                            style="flex:1; cursor:pointer; background:#4CAF50; color:white; border:none; font-size:1.3em; font-weight:bold;">Study</button>
+                        <button onclick="startTestMode('dokkai_drill', 4, false)"
+                            style="flex:1; cursor:pointer; background:#FF9800; color:white; border:none; font-size:1.3em; font-weight:bold;">Test</button>
+                    </div>
+                </div>
+
+                <!-- Chapter 5 -->
+                <div class="menu-card drill-card" style="border-left: 5px solid #ff9800; padding: 0; overflow: hidden;">
+                    <div style="padding: 15px; text-align: center; background: rgba(255,152,0,0.1);">
+                        <h3 style="margin: 0;">5 主張理解</h3>
+                        <p class="detail" style="margin: 5px 0 0 0;">Thematic Understanding</p>
+                    </div>
+                    <div style="display: flex; height: 80px;">
+                        <button onclick="startTestMode('dokkai_drill', 5, true)"
+                            style="flex:1; cursor:pointer; background:#4CAF50; color:white; border:none; font-size:1.3em; font-weight:bold;">Study</button>
+                        <button onclick="startTestMode('dokkai_drill', 5, false)"
+                            style="flex:1; cursor:pointer; background:#FF9800; color:white; border:none; font-size:1.3em; font-weight:bold;">Test</button>
+                    </div>
+                </div>
+
+                <!-- Chapter 6 -->
+                <div class="menu-card drill-card" style="border-left: 5px solid #ff9800; padding: 0; overflow: hidden;">
+                    <div style="padding: 15px; text-align: center; background: rgba(255,152,0,0.1);">
+                        <h3 style="margin: 0;">6 情報検索</h3>
+                        <p class="detail" style="margin: 5px 0 0 0;">Information Retrieval</p>
+                    </div>
+                    <div style="display: flex; height: 80px;">
+                        <button onclick="startTestMode('dokkai_drill', 6, true)"
+                            style="flex:1; cursor:pointer; background:#4CAF50; color:white; border:none; font-size:1.3em; font-weight:bold;">Study</button>
+                        <button onclick="startTestMode('dokkai_drill', 6, false)"
+                            style="flex:1; cursor:pointer; background:#FF9800; color:white; border:none; font-size:1.3em; font-weight:bold;">Test</button>
+                    </div>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <script>
+        function startTestMode(mode, chapter, isStudy) {
+            window.location.href = `test.html?mode=${mode}&chapter=${chapter}&study=${isStudy}`;
+        }
+
+        // Theme Toggle
+        function toggleTheme() {
+            const html = document.documentElement;
+            const isDark = html.classList.toggle('dark-theme');
+            html.classList.toggle('light-theme', !isDark);
+            localStorage.setItem('theme', isDark ? 'dark' : 'light');
+            updateThemeButton();
+        }
+
+        function updateThemeButton() {
+            const btn = document.getElementById('themeToggle');
+            if (!btn) return;
+            const isDark = document.documentElement.classList.contains('dark-theme');
+            btn.textContent = isDark ? '☀️' : '🌙';
+        }
+
+        // Apply saved theme on load
+        (function initTheme() {
+            const saved = localStorage.getItem('theme');
+            const html = document.documentElement;
+            if (saved === 'dark') {
+                html.classList.add('dark-theme');
+                html.classList.remove('light-theme');
+            } else if (saved === 'light') {
+                html.classList.add('light-theme');
+                html.classList.remove('dark-theme');
+            }
+            updateThemeButton();
+        })();
+    </script>
+</body>
+
+</html>
