@@ -44,23 +44,26 @@ let isStudyMode = false;
 let lastWrapper = null;
 let lastDokkaiText = null;
 
-// DOM Elements
-const questionList = document.getElementById('questionList');
-const testTitle = document.getElementById('testTitle');
-const timerDisplay = document.getElementById('timerDisplay');
-const progressInfo = document.getElementById('progressInfo');
-const finishBtn = document.getElementById('finishBtn');
-const resultModal = document.getElementById('resultModal');
-const scoreDisplay = document.getElementById('scoreDisplay');
-const studyControls = document.getElementById('studyControls');
-const toggleGoi = document.getElementById('toggleGoi');
-const toggleBunpoDokkai = document.getElementById('toggleBunpoDokkai');
+// DOM Elements (initialized in DOMContentLoaded)
+let questionList, testTitle, timerDisplay, progressInfo, finishBtn, resultModal, scoreDisplay, studyControls, toggleGoi, toggleBunpoDokkai;
 
 // Constants
 const QUESTIONS_PER_CHAPTER_GOI = 35; // Approx
 const QUESTIONS_PER_CHAPTER_BUNPO = 32; // Increased from 25
 
 document.addEventListener('DOMContentLoaded', async () => {
+    // Initialize DOM Elements
+    questionList = document.getElementById('questionList');
+    testTitle = document.getElementById('testTitle');
+    timerDisplay = document.getElementById('timerDisplay');
+    progressInfo = document.getElementById('progressInfo');
+    finishBtn = document.getElementById('finishBtn');
+    resultModal = document.getElementById('resultModal');
+    scoreDisplay = document.getElementById('scoreDisplay');
+    studyControls = document.getElementById('studyControls');
+    toggleGoi = document.getElementById('toggleGoi');
+    toggleBunpoDokkai = document.getElementById('toggleBunpoDokkai');
+
     // Parse URL params
     const urlParams = new URLSearchParams(window.location.search);
     currentMode = urlParams.get('mode') || 'combined';
@@ -106,12 +109,16 @@ document.addEventListener('DOMContentLoaded', async () => {
 
 async function loadData() {
     // Data is loaded via <script> tags in test.html
-    // n2QuestionsData comes from n2questions.js
-    if (typeof n2QuestionsData !== 'undefined') {
+    // Check global window object first, then fallback to local scope check
+    if (typeof window.n2QuestionsData !== 'undefined') {
+        n2Data = window.n2QuestionsData;
+    } else if (typeof n2QuestionsData !== 'undefined') {
         n2Data = n2QuestionsData;
     } else {
         console.error("n2QuestionsData is undefined. Check if n2questions.js is loaded correctly.");
-        questionList.innerHTML = `<p style="color: var(--error-color)">Error loading data. n2questions.js not found.</p>`;
+        if (questionList) {
+            questionList.innerHTML = `<p style="color: var(--error-color)">Error loading data. n2questions.js not found.</p>`;
+        }
     }
 }
 
@@ -306,6 +313,7 @@ function classifyGoiQuestions(goiAll) {
 
 function generateQuestions(mode, chapter) {
     let questions = [];
+    if (!n2Data) return [];
     const goiAll = n2Data['文字・語彙'] || [];
     const bunpoAll = n2Data['文法'] || [];
 
@@ -322,8 +330,9 @@ function generateQuestions(mode, chapter) {
 
     // --- GOI Mode ---
     // --- GOI Mode ---
+    // --- GOI Mode ---
     if (mode === 'goi' || mode === 'combined' || mode === 'study' || mode === 'shiken') {
-        const goiStructured = (typeof n2QuestionsStructured !== 'undefined') ? n2QuestionsStructured['文字・語彙'] : [];
+        const goiStructured = (window.n2QuestionsStructured) ? window.n2QuestionsStructured['文字・語彙'] : [];
         const goiLinear = n2Data['文字・語彙'] || [];
 
         if (mode === 'shiken') {
@@ -338,7 +347,7 @@ function generateQuestions(mode, chapter) {
             });
         } else {
             // ... existing chapter logic ...
-            if (goiStructured.length > 0) {
+            if (goiStructured && goiStructured.length > 0) {
                 const chapterData = goiStructured[chapter - 1];
                 if (chapterData) {
                     const order = ['reading', 'writing', 'formation', 'context', 'paraphrase', 'usage'];
@@ -364,7 +373,7 @@ function generateQuestions(mode, chapter) {
     }
 
     if (mode === 'bunpo_dokkai' || mode === 'combined' || mode === 'study' || mode === 'shiken') {
-        const bunpoStructured = (typeof n2QuestionsStructured !== 'undefined') ? n2QuestionsStructured['文法'] : [];
+        const bunpoStructured = (window.n2QuestionsStructured) ? window.n2QuestionsStructured['文法'] : [];
         const starAll = n2Data['星問題'] || [];
 
         // Bunpo Logic
@@ -378,10 +387,10 @@ function generateQuestions(mode, chapter) {
             questions.push(...mondai8.map((q, i) => formatQ(q, 'bunpo', i + 12))); // Offset index
 
             // Random Dokkai (1 set)
-            if (typeof photoTests !== 'undefined' && photoTests.length > 0) {
+            if (window.photoTests && window.photoTests.length > 0) {
                 // Get 1 random index
-                const r = Math.floor(Math.random() * photoTests.length);
-                const d = photoTests[r];
+                const r = Math.floor(Math.random() * window.photoTests.length);
+                const d = window.photoTests[r];
                 questions.push({
                     type: 'dokkai',
                     image: d.image.replace('./dokkai_photo', 'data/dokkai_photo'),
@@ -391,7 +400,7 @@ function generateQuestions(mode, chapter) {
 
         } else {
             // ... existing chapter logic ...
-            if (bunpoStructured.length > 0) {
+            if (bunpoStructured && bunpoStructured.length > 0) {
                 const chQuestions = bunpoStructured[chapter - 1] || [];
                 questions.push(...chQuestions.map((q, i) => formatQ(q, 'bunpo', i)));
             } else {
@@ -399,11 +408,11 @@ function generateQuestions(mode, chapter) {
             }
 
             // Add Dokkai (photoTests) for bunpo_dokkai, combined, and study modes
-            if ((mode === 'bunpo_dokkai' || mode === 'combined' || mode === 'study') && typeof photoTests !== 'undefined' && photoTests.length > 0) {
+            if ((mode === 'bunpo_dokkai' || mode === 'combined' || mode === 'study') && window.photoTests && window.photoTests.length > 0) {
                 // Get dokkai for current chapter (1-based index)
                 const chapterIndex = parseInt(chapter) - 1;
-                if (photoTests[chapterIndex]) {
-                    const d = photoTests[chapterIndex];
+                if (window.photoTests[chapterIndex]) {
+                    const d = window.photoTests[chapterIndex];
                     questions.push({
                         type: 'dokkai',
                         image: d.image.replace('./dokkai_photo', 'data/dokkai_photo'),
@@ -415,7 +424,7 @@ function generateQuestions(mode, chapter) {
     }
 
     if (mode === 'dokkai_drill') {
-        const textDokkai = (typeof drillDokkaiQuestions !== 'undefined') ? drillDokkaiQuestions : [];
+        const textDokkai = (window.drillDokkaiQuestions) ? window.drillDokkaiQuestions : [];
 
         let filtered = [];
         if (chapter === 'random') {

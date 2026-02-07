@@ -1,4 +1,4 @@
-const drillDokkaiQuestions = [
+window.drillDokkaiQuestions = [
   {
     "id": "1 内容理解　短文_1",
     "type": "text_dokkai",

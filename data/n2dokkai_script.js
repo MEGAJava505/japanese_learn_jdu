@@ -1,4 +1,4 @@
-const photoTests = [
+window.photoTests = [
   {
     image: "./dokkai_photo/n2dokkai_photo/1.png",
     questions: [

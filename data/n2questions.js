@@ -1,4 +1,4 @@
-const n2QuestionsData = {
+window.n2QuestionsData = {
   "文字・語彙": [
     {
       "question": "彼女は子どものとき、<u>行儀</u>作法を家庭で厳しく教え込まれた。",
