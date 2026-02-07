@@ -167,6 +167,39 @@ function setupTest() {
     updateProgress();
 }
 
+// Update display based on study mode checkbox toggles
+function updateStudyDisplay() {
+    const showGoi = toggleGoi ? toggleGoi.checked : true;
+    const showBunpoDokkai = toggleBunpoDokkai ? toggleBunpoDokkai.checked : true;
+
+    // Find all question sections and toggle visibility
+    const allSections = document.querySelectorAll('.section-block');
+    allSections.forEach(section => {
+        const id = section.id || '';
+        // GOI sections have type 'goi' in their class or id
+        const isGoi = id.includes('goi') || section.querySelector('[data-type="goi"]');
+        // Bunpo/Dokkai sections
+        const isBunpoDokkai = id.includes('bunpo') || id.includes('dokkai') ||
+            section.querySelector('[data-type="bunpo"]') ||
+            section.querySelector('[data-type="dokkai"]');
+
+        if (isGoi && !isBunpoDokkai) {
+            section.style.display = showGoi ? '' : 'none';
+        } else if (isBunpoDokkai && !isGoi) {
+            section.style.display = showBunpoDokkai ? '' : 'none';
+        }
+        // If both or neither, show based on any checked
+    });
+
+    // Also hide/show dokkai wrapper if exists
+    const dokkaiWrapper = document.querySelector('.dokkai-wrapper');
+    if (dokkaiWrapper) {
+        dokkaiWrapper.style.display = showBunpoDokkai ? '' : 'none';
+    }
+
+    updateProgress();
+}
+
 const QUESTIONS_PER_TYPE = {
     reading: 5,
     writing: 5,
