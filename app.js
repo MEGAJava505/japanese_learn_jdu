@@ -61,12 +61,6 @@ const QUESTIONS_PER_CHAPTER_GOI = 35; // Approx
 const QUESTIONS_PER_CHAPTER_BUNPO = 32; // Increased from 25
 
 document.addEventListener('DOMContentLoaded', async () => {
-    console.log("App initialized. Toggles found?", {
-        goi: !!toggleGoi,
-        bunpo: !!toggleBunpoDokkai,
-        studyControls: !!studyControls
-    });
-
     // Parse URL params
     const urlParams = new URLSearchParams(window.location.search);
     currentMode = urlParams.get('mode') || 'combined';
@@ -93,17 +87,15 @@ document.addEventListener('DOMContentLoaded', async () => {
     const tGoi = document.getElementById('toggleGoi');
     const tBunpo = document.getElementById('toggleBunpoDokkai');
 
-    console.log("Re-queried toggles:", { tGoi, tBunpo });
+
 
     if (tGoi) {
-        tGoi.addEventListener('change', (e) => {
-            console.log('GOI toggle changed:', e.target.checked);
+        tGoi.addEventListener('change', () => {
             updateStudyDisplay();
         });
     }
     if (tBunpo) {
-        tBunpo.addEventListener('change', (e) => {
-            console.log('BUNPO toggle changed:', e.target.checked);
+        tBunpo.addEventListener('change', () => {
             updateStudyDisplay();
         });
     }
@@ -197,24 +189,16 @@ function setupTest() {
 
 // Update display based on study mode checkbox toggles
 function updateStudyDisplay() {
-    console.log('Updating Study Display...');
-
     const tGoi = document.getElementById('toggleGoi');
     const tBunpo = document.getElementById('toggleBunpoDokkai');
 
-    if (!tGoi || !tBunpo) {
-        console.error("Toggles not found in updateStudyDisplay!");
-        return;
-    }
+    if (!tGoi || !tBunpo) return;
 
     const showGoi = tGoi.checked;
     const showBunpoDokkai = tBunpo.checked;
 
-    console.log(`Goi: ${showGoi}, Bunpo/Dokkai: ${showBunpoDokkai}`);
-
     // Find all question sections and toggle visibility
     const allSections = document.querySelectorAll('.section-block');
-    console.log(`Found ${allSections.length} sections.`);
 
     allSections.forEach(section => {
         const id = section.id || '';
@@ -224,8 +208,6 @@ function updateStudyDisplay() {
         const isBunpoDokkai = id.includes('bunpo') || id.includes('dokkai') ||
             section.querySelector('[data-type="bunpo"]') ||
             section.querySelector('[data-type="dokkai"]');
-
-        console.log(`Section [${id}]: isGoi=${isGoi}, isBunpo=${isBunpoDokkai}`);
 
         if (isGoi && !isBunpoDokkai) {
             section.style.display = showGoi ? 'block' : 'none';
