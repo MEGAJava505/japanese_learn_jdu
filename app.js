@@ -214,6 +214,8 @@ function updateStudyDisplay() {
 
     // Find all question sections and toggle visibility
     const allSections = document.querySelectorAll('.section-block');
+    console.log(`Found ${allSections.length} sections.`);
+
     allSections.forEach(section => {
         const id = section.id || '';
         // GOI sections have type 'goi' in their class or id
@@ -223,10 +225,12 @@ function updateStudyDisplay() {
             section.querySelector('[data-type="bunpo"]') ||
             section.querySelector('[data-type="dokkai"]');
 
+        console.log(`Section [${id}]: isGoi=${isGoi}, isBunpo=${isBunpoDokkai}`);
+
         if (isGoi && !isBunpoDokkai) {
-            section.style.display = showGoi ? '' : 'none';
+            section.style.display = showGoi ? 'block' : 'none';
         } else if (isBunpoDokkai && !isGoi) {
-            section.style.display = showBunpoDokkai ? '' : 'none';
+            section.style.display = showBunpoDokkai ? 'block' : 'none';
         }
     });
 
