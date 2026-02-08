@@ -845,27 +845,7 @@ function finishTest() {
         popup.style.display = 'none';
     }, { passive: true });
 
-    // Fetch reading from Jisho API (using CORS proxy)
-    async function fetchReading(word) {
-        try {
-            const jishoUrl = `https://jisho.org/api/v1/search/words?keyword=${encodeURIComponent(word)}`;
-            const proxyUrl = `https://api.allorigins.win/get?url=${encodeURIComponent(jishoUrl)}`;
-            const response = await fetch(proxyUrl);
-            const proxyData = await response.json();
-            const data = JSON.parse(proxyData.contents);
 
-            if (data.data && data.data.length > 0) {
-                const entry = data.data[0];
-                const reading = entry.japanese[0].reading || entry.japanese[0].word || word;
-                const meanings = entry.senses.slice(0, 2).map(s => s.english_definitions.slice(0, 3).join(', ')).join('; ');
-                return { reading, meanings };
-            }
-            return null;
-        } catch (e) {
-            console.error('Jisho API error:', e);
-            return null;
-        }
-    }
 
     // Handle text selection (on mouseup)
     document.addEventListener('mouseup', async (e) => {
@@ -904,9 +884,64 @@ function finishTest() {
 })();
 
 // Text Zoom Helpers (Inline)
-function showTextZoom(btn) {
+async function showTextZoom(btn) {
     if (btn && btn.classList) {
-        btn.classList.toggle('zoomed-text');
+        const isZoomed = btn.classList.toggle('zoomed-text');
+
+        // If zoomed in, fetch info if not present
+        if (isZoomed && !btn.querySelector('.furigana-info')) {
+            // Get text (remove number prefix if needed, e.g. "1. 食べる" -> "食べる")
+            let text = btn.textContent.trim();
+            // Remove "1. " or "2. " prefix
+            text = text.replace(/^\d+\.\s*/, '');
+            // Also need to be careful with existing HTML structure if any, but btn usually has text + maybe some spans?
+            // Actually btn.innerHTML was set as `${optIdx + 1}. ${opt}`
+            // So textContent is safe. But if we already added .furigana-info, we shouldn't be here (checked above).
+
+            // Show loading placeholder?
+            // Maybe just wait.
+
+            const result = await fetchReading(text);
+            if (result) {
+                const infoDiv = document.createElement('div');
+                infoDiv.className = 'furigana-info';
+
+                const readingDiv = document.createElement('div');
+                readingDiv.className = 'furigana-reading';
+                readingDiv.textContent = result.reading;
+
+                const meaningDiv = document.createElement('div');
+                meaningDiv.className = 'furigana-meaning';
+                meaningDiv.textContent = result.meanings;
+
+                infoDiv.appendChild(readingDiv);
+                infoDiv.appendChild(meaningDiv);
+
+                btn.appendChild(infoDiv);
+            }
+        }
+    }
+}
+
+// Global Jisho API Fetcher
+async function fetchReading(word) {
+    try {
+        const jishoUrl = `https://jisho.org/api/v1/search/words?keyword=${encodeURIComponent(word)}`;
+        const proxyUrl = `https://api.allorigins.win/get?url=${encodeURIComponent(jishoUrl)}`;
+        const response = await fetch(proxyUrl);
+        const proxyData = await response.json();
+        const data = JSON.parse(proxyData.contents);
+
+        if (data.data && data.data.length > 0) {
+            const entry = data.data[0];
+            const reading = entry.japanese[0].reading || entry.japanese[0].word || word;
+            const meanings = entry.senses.slice(0, 2).map(s => s.english_definitions.slice(0, 3).join(', ')).join('; ');
+            return { reading, meanings };
+        }
+        return null;
+    } catch (e) {
+        console.error('Jisho API error:', e);
+        return null;
     }
 }
 

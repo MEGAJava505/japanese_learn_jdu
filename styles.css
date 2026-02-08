@@ -608,6 +608,43 @@ input[type="number"] {
   /* Slight pop */
   white-space: normal;
   /* Ensure text wraps if needed */
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  gap: 12px;
+}
+
+.furigana-info {
+  font-size: 1rem;
+  font-weight: normal;
+  color: var(--text-secondary);
+  border-top: 1px solid var(--surface-hover);
+  padding-top: 10px;
+  width: 100%;
+  animation: fadeIn 0.3s ease-out;
+  display: none;
+  /* Hidden by default */
+  flex-direction: column;
+  gap: 4px;
+}
+
+.option-btn.zoomed-text .furigana-info {
+  display: flex;
+  /* Show only when zoomed */
+}
+
+.furigana-reading {
+  font-size: 1.2rem;
+  color: var(--primary-color);
+  font-weight: bold;
+}
+
+.furigana-meaning {
+  font-size: 0.9rem;
+  color: var(--text-primary);
+  opacity: 0.9;
+  line-height: 1.4;
 }
 
 /* Study mode interactive option styles */
