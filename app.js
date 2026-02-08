@@ -420,7 +420,12 @@ function generateQuestions(mode, chapter) {
                     questions.push({
                         type: 'dokkai',
                         image: d.image.replace('./dokkai_photo', 'data/dokkai_photo'),
-                        questions: d.questions.map((q, i) => ({ ...q, id: `dokkai_${chapterIndex}_${i}` }))
+                        questions: d.questions.map((q, i) => ({
+                            ...q,
+                            id: `dokkai_${chapterIndex}_${i}`,
+                            userAnswer: null, // Critical for clickability
+                            answer: q.correct // Normalize key
+                        }))
                     });
                 }
             }
@@ -718,10 +723,10 @@ function renderQuestions() {
 
 function handleAnswer(item, selectedIdx, btn, container) {
     if (currentMode === 'study' && !isStudyMode) return; // Legacy read-only
-    if (item.userAnswer !== null) return;
+    if (item.userAnswer != null) return; // Use loose inequality to catch undefined
 
     // Update State
-    const isFirstTime = (item.userAnswer === null);
+    const isFirstTime = (item.userAnswer == null);
     item.userAnswer = selectedIdx;
     if (isFirstTime) answeredCount++;
 
@@ -734,12 +739,16 @@ function handleAnswer(item, selectedIdx, btn, container) {
     // Check correctness
     let isCorrect = false;
     let correctIdx = -1;
-    if (typeof item.answer === 'number') {
-        correctIdx = item.answer;
+
+    // Support both 'answer' and 'correct' keys
+    const actualAnswer = (item.answer !== undefined) ? item.answer : item.correct;
+
+    if (typeof actualAnswer === 'number') {
+        correctIdx = actualAnswer;
         isCorrect = (selectedIdx === correctIdx);
     } else {
-        isCorrect = (item.options[selectedIdx] === item.answer);
-        correctIdx = item.options.indexOf(item.answer);
+        isCorrect = (item.options[selectedIdx] === actualAnswer);
+        correctIdx = item.options.indexOf(actualAnswer);
     }
 
     // FEEDBACK STRATEGY
