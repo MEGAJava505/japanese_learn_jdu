@@ -594,8 +594,13 @@ function renderQuestions() {
                     btn.className = 'option-btn';
                     btn.innerHTML = `${optIdx + 1}. ${opt}`;
                     btn.onclick = () => handleAnswer(q, optIdx, btn, optGrid);
-                    if (currentMode === 'study') {
-                        btn.disabled = true;
+                    if (isStudyMode || currentMode === 'study') {
+                        // Modified for Text Zoom: Don't disable, make clickable
+                        btn.classList.add('study-option');
+                        btn.onclick = (e) => {
+                            e.stopPropagation();
+                            showTextZoom(btn); // Pass btn element
+                        };
                         if (optIdx === q.correct) btn.classList.add('correct');
                     }
                     optGrid.appendChild(btn);
@@ -706,11 +711,18 @@ function renderQuestions() {
                 btn.className = 'option-btn';
                 btn.innerHTML = `${optIdx + 1}. ${opt}`;
                 btn.onclick = () => handleAnswer(item, optIdx, btn, optGrid);
-                if (currentMode === 'study') {
-                    btn.disabled = true;
+                if (isStudyMode || currentMode === 'study') {
+                    // Modified for Text Zoom
+                    btn.classList.add('study-option');
+                    btn.onclick = (e) => {
+                        e.stopPropagation();
+                        showTextZoom(btn); // Pass btn element
+                    };
                     // Fix correct highlighting usage
-                    let correctIdx = (typeof item.answer === 'string') ? item.options.indexOf(item.answer) : item.answer;
-                    if (optIdx === correctIdx || opt === item.answer) {
+                    const actualAnswer = (item.answer !== undefined) ? item.answer : item.correct;
+                    let correctIdx = (typeof actualAnswer === 'number') ? actualAnswer : item.options.indexOf(actualAnswer);
+
+                    if (optIdx === correctIdx) {
                         btn.classList.add('correct');
                     }
                 }
@@ -890,3 +902,11 @@ function finishTest() {
         }, 10);
     });
 })();
+
+// Text Zoom Helpers (Inline)
+function showTextZoom(btn) {
+    if (btn && btn.classList) {
+        btn.classList.toggle('zoomed-text');
+    }
+}
+

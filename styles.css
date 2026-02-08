@@ -587,8 +587,42 @@ input[type="number"] {
     grid-template-columns: 1fr;
   }
 
+
   /* Full-width drill buttons */
   .drill-card>div:last-child {
     height: 60px;
+  }
+}
+
+/* Text Zoom (Inline) */
+.option-btn.zoomed-text {
+  font-size: 1.5rem !important;
+  /* Make text larger */
+  line-height: 1.6;
+  padding: 20px;
+  background-color: var(--surface-color);
+  z-index: 10;
+  position: relative;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+  transform: scale(1.02);
+  /* Slight pop */
+  white-space: normal;
+  /* Ensure text wraps if needed */
+}
+
+/* Study mode interactive option styles */
+.study-option {
+  cursor: zoom-in !important;
+  transition: all 0.2s ease-out;
+}
+
+.study-option.zoomed-text {
+  cursor: zoom-out !important;
+}
+
+/* Mobile adjustments for Zoom */
+@media (max-width: 600px) {
+  .option-btn.zoomed-text {
+    font-size: 1.3rem !important;
   }
 }
