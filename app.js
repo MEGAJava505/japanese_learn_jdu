@@ -159,17 +159,37 @@ function setupTest() {
         studyControls.style.display = 'flex';
         finishBtn.style.display = 'none';
 
-        // Initialize Chapter Selector
-        const chapterSelect = document.getElementById('chapterSelect');
-        if (chapterSelect) {
-            chapterSelect.innerHTML = '';
-            // Option for "Random"
-            const randOpt = document.createElement('option');
-            randOpt.value = 'random';
-            randOpt.textContent = 'Random';
-            if (currentChapter === 'random') randOpt.selected = true;
-            chapterSelect.appendChild(randOpt);
 
+    } else {
+        studyControls.style.display = 'none';
+
+        // Handling Finish Button for New Modes
+        if (currentMode === 'dokkai_drill' && isStudyMode) {
+            finishBtn.style.display = 'none';
+        } else {
+            finishBtn.style.display = 'inline-flex';
+        }
+    }
+
+    // NEW: Chapter Selector Logic (Global for Study & Combined)
+    const chapterSelectWrapper = document.querySelector('.chapter-selector-wrapper');
+    const chapterSelect = document.getElementById('chapterSelect');
+
+    if (chapterSelect && chapterSelectWrapper) {
+        if (currentMode === 'study' || currentMode === 'combined') {
+            chapterSelectWrapper.style.display = 'flex'; // Ensure visible
+            chapterSelect.innerHTML = '';
+
+            // "Random" Option - ONLY for Study Mode
+            if (currentMode === 'study') {
+                const randOpt = document.createElement('option');
+                randOpt.value = 'random';
+                randOpt.textContent = 'Random';
+                if (currentChapter === 'random') randOpt.selected = true;
+                chapterSelect.appendChild(randOpt);
+            }
+
+            // Chapters 1-15
             for (let i = 1; i <= 15; i++) {
                 const option = document.createElement('option');
                 option.value = i;
@@ -179,15 +199,9 @@ function setupTest() {
                 }
                 chapterSelect.appendChild(option);
             }
-        }
-    } else {
-        studyControls.style.display = 'none';
-
-        // Handling Finish Button for New Modes
-        if (currentMode === 'dokkai_drill' && isStudyMode) {
-            finishBtn.style.display = 'none';
         } else {
-            finishBtn.style.display = 'inline-flex';
+            // Hide for other modes
+            chapterSelectWrapper.style.display = 'none';
         }
     }
 

@@ -25,6 +25,12 @@
                 <a href="index.html" class="btn btn-secondary">← Menu</a>
                 <h1 id="testTitle">Test Mode</h1>
                 <div style="display: flex; align-items: center; gap: 12px;">
+                    <div class="chapter-selector-wrapper">
+                        <label for="chapterSelect" style="font-weight: bold;">Chapter:</label>
+                        <select id="chapterSelect" onchange="changeChapter(this.value)">
+                            <!-- Options populated by JS -->
+                        </select>
+                    </div>
                     <a id="jishoLink" href="https://jisho.org" target="_blank"
                         style="color:var(--primary-color); text-decoration:none; font-size:0.9em;">Jisho 🔍</a>
                     <div class="timer" id="timerDisplay"></div>
@@ -53,12 +59,7 @@
                     <span>文法・読解 (BUNPO+DOKKAI)</span>
                 </label>
 
-                <div class="chapter-selector-wrapper">
-                    <label for="chapterSelect" style="font-weight: bold;">Chapter:</label>
-                    <select id="chapterSelect" onchange="changeChapter(this.value)">
-                        <!-- Options populated by JS -->
-                    </select>
-                </div>
+
             </div>
         </header>
 
