@@ -817,7 +817,16 @@ function exitDrill() {
 
 
 
+
 function updateProgress() {
+    // Hide progress in Study Mode as per user request
+    if (isStudyMode) {
+        if (progressInfo) progressInfo.style.display = 'none';
+        return;
+    } else {
+        if (progressInfo) progressInfo.style.display = 'block'; // Ensure visible otherwise
+    }
+
     let total = 0;
     // Calculate total questions (flatten dokkai)
     currentQuestions.forEach(q => {
