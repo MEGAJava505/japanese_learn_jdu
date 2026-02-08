@@ -435,6 +435,50 @@ input[type="number"] {
   accent-color: var(--secondary-color);
 }
 
+.chapter-selector-wrapper {
+  margin-left: 20px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+#chapterSelect {
+  padding: 6px 12px;
+  border-radius: 8px;
+  border: 1px solid var(--surface-hover);
+  background-color: var(--bg-color);
+  color: var(--text-primary);
+  font-family: inherit;
+  font-size: 0.95rem;
+  cursor: pointer;
+  transition: border-color 0.2s;
+}
+
+#chapterSelect:hover {
+  border-color: var(--primary-color);
+}
+
+#chapterSelect:focus {
+  outline: none;
+  border-color: var(--primary-color);
+  box-shadow: 0 0 0 2px rgba(124, 77, 255, 0.2);
+}
+
+/* Response for small screens */
+@media (max-width: 600px) {
+  .chapter-selector-wrapper {
+    margin-left: 0;
+    width: 100%;
+    justify-content: center;
+    margin-top: 10px;
+  }
+
+  #chapterSelect {
+    flex: 1;
+    max-width: 200px;
+  }
+}
+
 /* Dokkai Specific */
 .dokkai-header {
   background: var(--surface-hover);

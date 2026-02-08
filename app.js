@@ -51,6 +51,9 @@ let questionList, testTitle, timerDisplay, progressInfo, finishBtn, resultModal,
 const QUESTIONS_PER_CHAPTER_GOI = 35; // Approx
 const QUESTIONS_PER_CHAPTER_BUNPO = 32; // Increased from 25
 
+// SECRET TOKEN OBFUSCATION
+// Token check removed by user request
+
 document.addEventListener('DOMContentLoaded', async () => {
     // Initialize DOM Elements
     questionList = document.getElementById('questionList');
@@ -155,6 +158,28 @@ function setupTest() {
     if (currentMode === 'study') {
         studyControls.style.display = 'flex';
         finishBtn.style.display = 'none';
+
+        // Initialize Chapter Selector
+        const chapterSelect = document.getElementById('chapterSelect');
+        if (chapterSelect) {
+            chapterSelect.innerHTML = '';
+            // Option for "Random"
+            const randOpt = document.createElement('option');
+            randOpt.value = 'random';
+            randOpt.textContent = 'Random';
+            if (currentChapter === 'random') randOpt.selected = true;
+            chapterSelect.appendChild(randOpt);
+
+            for (let i = 1; i <= 15; i++) {
+                const option = document.createElement('option');
+                option.value = i;
+                option.textContent = `第${i}回`;
+                if (parseInt(currentChapter) === i) {
+                    option.selected = true;
+                }
+                chapterSelect.appendChild(option);
+            }
+        }
     } else {
         studyControls.style.display = 'none';
 
@@ -943,5 +968,14 @@ async function fetchReading(word) {
         console.error('Jisho API error:', e);
         return null;
     }
+}
+
+// Function to handle chapter change in Study Mode
+function changeChapter(newChapter) {
+    const urlParams = new URLSearchParams(window.location.search);
+    urlParams.set('chapter', newChapter);
+    // Keep mode as study
+    if (!urlParams.get('mode')) urlParams.set('mode', 'study');
+    window.location.search = urlParams.toString();
 }
 
