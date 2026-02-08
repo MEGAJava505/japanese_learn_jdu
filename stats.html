@@ -1,0 +1,116 @@
+<!DOCTYPE html>
+<html lang="ja">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Answer Statistics - JLPT N2</title>
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@300;400;500;700&display=swap"
+        rel="stylesheet">
+    <link rel="stylesheet" href="styles.css">
+    <style>
+        .stats-container {
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        .stat-card {
+            background: var(--card-bg);
+            border-radius: 12px;
+            padding: 20px;
+            margin-bottom: 20px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        }
+
+        .stat-title {
+            font-size: 1.2rem;
+            font-weight: bold;
+            margin-bottom: 15px;
+            border-bottom: 2px solid var(--border-color);
+            padding-bottom: 10px;
+        }
+
+        .bar-chart {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+
+        .bar-row {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .bar-label {
+            width: 80px;
+            font-weight: bold;
+        }
+
+        .bar-track {
+            flex-grow: 1;
+            background: var(--bg-color);
+            height: 24px;
+            border-radius: 12px;
+            overflow: hidden;
+            position: relative;
+        }
+
+        .bar-fill {
+            height: 100%;
+            background: var(--primary-color);
+            transition: width 0.5s ease-out;
+            display: flex;
+            align-items: center;
+            justify-content: flex-end;
+            padding-right: 8px;
+            color: white;
+            font-size: 0.85rem;
+        }
+
+        .best-option {
+            background: var(--accent-color);
+        }
+
+        .back-btn {
+            display: inline-block;
+            margin-bottom: 20px;
+            color: var(--text-color);
+            text-decoration: none;
+            font-weight: bold;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="container stats-container">
+        <a href="index.html" class="back-btn">← Back to Menu</a>
+        <h1>Answer Key Statistics</h1>
+        <p>Analysis of correct answer distribution across different modes.</p>
+
+        <div id="statsContent">
+            <p>Loading data...</p>
+        </div>
+    </div>
+
+    <!-- Data Scripts -->
+    <script src="data/n2questions.js"></script>
+    <script src="data/n2questions_structured.js"></script>
+    <script src="data/drill_dokkai.js"></script>
+    <script src="data/n2dokkai_script.js"></script>
+
+    <!-- Logic -->
+    <script src="stats.js"></script>
+    <script>
+        // Init theme
+        (function () {
+            const saved = localStorage.getItem('theme');
+            if (saved === 'dark' || (!saved && window.matchMedia('(prefers-color-scheme: dark)').matches)) {
+                document.documentElement.classList.add('dark-theme');
+            }
+        })();
+    </script>
+</body>
+
+</html>
