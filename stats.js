@@ -15,30 +15,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
             if (ans !== undefined && ans !== null) {
                 // Convert to 1-based index if it's 0-based
-                // In counting script we established:
-                // n2questions.js (vocab): 0-3 index ? Let's check. 
-                // Step 2945 view_file n2questions.js: "answer": 2. options length 4. 
-                // Usually these are 1-based in some raw data, but app.js treats them as indices?
-                // Let's re-verify app.js handleAnswer.
-                // Wait, if answer is 2, and options are [0,1,2,3], then it's 2.
-                // In analyze_answers.js I used `counts[ans]++`.
-
-                // CRITICAL: We need to know if 'ans' is 0-based or 1-based index in the raw data.
-                // In n2questions.js, checking Step 2945... options are arrays.
-                // If answer is 2, it points to the 3rd option?
-                // Analyze_answers.js output showed distributions.
-
-                // Let's assume the raw data is consistent 0-based index for now, 
-                // except maybe some parts.
-                // Actually, let's stick to what analyze_answers.js did: just count the value.
-                // Most values were 0,1,2,3.
-
                 let val = parseInt(ans);
-                // Shift to 1-based for display "Option 1..4"
-                // If the data is 0-3, we add 1.
-                // If data is 1-4, we keep it.
-                // Based on analysis output "Option 1: ...", and standard array indexing, 
-                // values are likely 0-3.
 
                 if (val >= 0 && val <= 3) {
                     counts[val + 1]++;
@@ -54,6 +31,8 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     function renderSection(title, questions) {
+        if (!questions || questions.length === 0) return; // Skip if no questions
+
         const stats = calculateStats(questions);
         if (!stats) return;
 
@@ -103,12 +82,35 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // 1. Drill Dokkai
     const drillQs = [];
+    let drillPassageCount = 0;
     if (window.drillDokkaiQuestions) {
+        drillPassageCount = window.drillDokkaiQuestions.length;
         window.drillDokkaiQuestions.forEach(b => drillQs.push(...(b.questions || [])));
     }
-    renderSection("Drill Dokkai (Reading Drills)", drillQs);
+    renderSection(`Drill Dokkai (Reading Drills) <span style="font-size:0.8em">(${drillPassageCount} Passages)</span>`, drillQs);
 
-    // 2. Bunpo (Grammar)
+    // 2. Goi (Vocabulary)
+    const goiQs = [];
+    if (window.n2QuestionsStructured && window.n2QuestionsStructured['文字・語彙']) {
+        const data = window.n2QuestionsStructured['文字・語彙'];
+        if (Array.isArray(data)) {
+            data.forEach(item => {
+                if (Array.isArray(item)) goiQs.push(...item); // If chapter based
+                else {
+                    // It might be object with reading/writing keys
+                    if (item.reading) goiQs.push(...item.reading);
+                    if (item.writing) goiQs.push(...item.writing);
+                    if (item.formation) goiQs.push(...item.formation);
+                    if (item.context) goiQs.push(...item.context);
+                    if (item.paraphrase) goiQs.push(...item.paraphrase);
+                    if (item.usage) goiQs.push(...item.usage);
+                }
+            });
+        }
+    }
+    renderSection("Goi (Vocabulary)", goiQs);
+
+    // 3. Bunpo (Grammar)
     const bunpoQs = [];
     if (window.n2QuestionsStructured && window.n2QuestionsStructured['文法']) {
         const data = window.n2QuestionsStructured['文法'];
@@ -121,7 +123,7 @@ document.addEventListener('DOMContentLoaded', () => {
     }
     renderSection("Bunpo (Grammar)", bunpoQs);
 
-    // 3. Photo Dokkai
+    // 4. Photo Dokkai
     const photoQs = [];
     if (window.photoTests) {
         window.photoTests.forEach(pt => photoQs.push(...(pt.questions || [])));
@@ -137,5 +139,85 @@ document.addEventListener('DOMContentLoaded', () => {
     }
     shikenQs.push(...photoQs);
     renderSection("Shiken (Full Mock Test Pool)", shikenQs);
+
+    // 5. Simulated Shiken (54 Tests)
+    // Helper from app.js
+    function classifyGoiQuestions(goiAll) {
+        const buckets = { reading: [], writing: [], formation: [], context: [], paraphrase: [], usage: [] };
+        goiAll.forEach(q => {
+            const text = q.question;
+            if (!text.includes('<u>') && !text.includes('(') && !text.includes('（')) { buckets.usage.push(q); return; }
+            if (text.includes('(') || text.includes('（')) {
+                const avgLen = q.options.reduce((sum, opt) => sum + opt.length, 0) / q.options.length;
+                if (avgLen <= 2.2) buckets.formation.push(q);
+                else buckets.context.push(q);
+                return;
+            }
+            if (text.includes('<u>')) {
+                const optionsAreKana = q.options.every(opt => /^[\u3040-\u309f\u30a0-\u30ff\u30fc]+$/.test(opt));
+                const match = text.match(/<u>(.*?)<\/u>/);
+                const content = match ? match[1] : '';
+                const isTargetKana = /^[\u3040-\u309f\u30a0-\u30ff\u30fc]+$/.test(content);
+                if (optionsAreKana) buckets.reading.push(q);
+                else if (isTargetKana) buckets.writing.push(q);
+                else buckets.paraphrase.push(q);
+            } else { buckets.context.push(q); }
+        });
+        return buckets;
+    }
+
+    const QUESTIONS_PER_TYPE = { reading: 5, writing: 5, formation: 5, context: 7, paraphrase: 5, usage: 5 };
+
+    if (window.n2QuestionsData) {
+        const goiAll = window.n2QuestionsData['文字・語彙'] || [];
+        const bunpoAll = window.n2QuestionsData['文法'] || [];
+        const starAll = window.n2QuestionsData['星問題'] || [];
+        const photoTests = window.photoTests || [];
+
+        const buckets = classifyGoiQuestions(goiAll);
+
+        let simGoi = [];
+        let simBunpo = [];
+        let simDokkai = [];
+        const NUM_TESTS = 1000; // 1000 iterations for accurate Monte Carlo simulation
+
+        for (let t = 0; t < NUM_TESTS; t++) {
+            // GOI (Questions 1-32)
+            Object.keys(buckets).forEach(type => {
+                const count = QUESTIONS_PER_TYPE[type] || 5;
+                const randomSet = buckets[type].sort(() => 0.5 - Math.random()).slice(0, count);
+                simGoi.push(...randomSet);
+            });
+
+            // BUNPO (Questions 33-49)
+            // Mondai 7: Normal Grammar (12 Qs)
+            const mondai7 = bunpoAll.sort(() => 0.5 - Math.random()).slice(0, 12);
+            simBunpo.push(...mondai7);
+
+            // Mondai 8: Star Questions (5 Qs)
+            const mondai8 = starAll.sort(() => 0.5 - Math.random()).slice(0, 5);
+            simBunpo.push(...mondai8);
+
+            // DOKKAI (Questions 50-54)
+            if (photoTests.length > 0) {
+                const r = Math.floor(Math.random() * photoTests.length);
+                const d = photoTests[r];
+                if (d && d.questions) {
+                    simDokkai.push(...d.questions);
+                }
+            }
+        }
+
+        // Render aggregated and split sections
+        renderSection(`Simulated Shiken - Goi Part (Q1-32) <span style="font-size:0.8em">[${simGoi.length} Qs]</span>`, simGoi);
+        renderSection(`Simulated Shiken - Bunpo Part (Q33-49) <span style="font-size:0.8em">[${simBunpo.length} Qs]</span>`, simBunpo);
+        renderSection(`Simulated Shiken - Dokkai Part (Q50-54) <span style="font-size:0.8em">[${simDokkai.length} Qs]</span>`, simDokkai);
+
+        // Overall Aggregate
+        const allSim = [...simGoi, ...simBunpo, ...simDokkai];
+        renderSection(`Simulated Shiken - Full Test (Aggregated) <span style="font-size:0.8em; color:var(--primary-color)">[Monte Carlo: ${state_questions_count()} Qs]</span>`, allSim);
+
+        function state_questions_count() { return allSim.length; }
+    }
 
 });
