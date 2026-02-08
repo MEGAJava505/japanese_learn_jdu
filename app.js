@@ -481,8 +481,11 @@ function renderQuestions() {
     lastDokkaiText = null;
 
     let globalIndex = 0;
-    // If we are in 'bunpo_dokkai' mode (Chapter), Bunpo questions usually start at Q33 in the book.
-    if ((currentMode === 'bunpo_dokkai' || currentMode === 'study') && currentQuestions.some(q => q.type === 'bunpo')) {
+    // Only start at 32 if we are NOT showing Goi questions (otherwise Goi would start at 33)
+    const hasGoi = currentQuestions.some(q => q.type === 'goi');
+    const hasBunpo = currentQuestions.some(q => q.type === 'bunpo');
+
+    if ((currentMode === 'bunpo_dokkai' || currentMode === 'study') && !hasGoi && hasBunpo) {
         globalIndex = 32;
     }
 
