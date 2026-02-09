@@ -1061,7 +1061,6 @@ function showFullTestReview(wrongAnswers, finalScore, totalQuestions) {
     }, { passive: true });
 
 
-
     // Handle text selection (on mouseup)
     document.addEventListener('mouseup', async (e) => {
         // Small delay to ensure selection is complete
@@ -1318,3 +1317,49 @@ function createScrollTopBtn() {
     document.body.appendChild(btn);
 }
 
+// Toggle Study Mode (for Photo Dokkai)
+window.toggleStudyMode = function () {
+    isStudyMode = !isStudyMode;
+
+    // Update visual state of toggle button if it exists
+    const btn = document.getElementById('photoDokkaiToggle');
+    if (btn) {
+        btn.textContent = isStudyMode ? 'Switch to Test Mode' : 'Switch to Study Mode';
+        btn.style.backgroundColor = isStudyMode ? '#9C27B0' : '#4CAF50';
+    }
+
+    // Re-render to apply changes
+    renderQuestions();
+};
+
+document.addEventListener('DOMContentLoaded', () => {
+    // Initial check for Photo Dokkai specific controls
+    if (currentMode === 'photo_dokkai') {
+        const headerRight = document.querySelector('header > div > div:last-child');
+
+        // Create Toggle Button
+        if (!document.getElementById('photoDokkaiToggle')) {
+            const toggleBtn = document.createElement('button');
+            toggleBtn.id = 'photoDokkaiToggle';
+            toggleBtn.textContent = isStudyMode ? 'Switch to Test Mode' : 'Switch to Study Mode';
+            toggleBtn.style.cssText = `
+                background-color: ${isStudyMode ? '#9C27B0' : '#4CAF50'};
+                color: white;
+                border: none;
+                padding: 5px 10px;
+                border-radius: 4px;
+                cursor: pointer;
+                margin-right: 10px;
+                font-weight: bold;
+                font-size: 0.9em;
+            `;
+            toggleBtn.onclick = window.toggleStudyMode;
+
+            // Insert before Jisho link
+            const jishoLink = document.getElementById('jishoLink');
+            if (jishoLink && headerRight) {
+                headerRight.insertBefore(toggleBtn, jishoLink);
+            }
+        }
+    }
+});
