@@ -220,4 +220,101 @@ document.addEventListener('DOMContentLoaded', () => {
         function state_questions_count() { return allSim.length; }
     }
 
+    // 6. Detailed Photo Dokkai Analysis (Q50 - Q54)
+    function analyzePhotoDokkai() {
+        if (!window.photoTests || window.photoTests.length === 0) return;
+
+        // Data structure: 5 questions (index 0-4 corresponding to Q50-Q54)
+        // Each has counts for options 1-4
+        const questionStats = Array(5).fill(null).map(() => ({ 1: 0, 2: 0, 3: 0, 4: 0, total: 0 }));
+
+        window.photoTests.forEach(test => {
+            if (!test.questions) return;
+            test.questions.forEach((q, idx) => {
+                if (idx >= 5) return; // Only first 5 questions (50-54)
+
+                let ans = q.correct;
+                // Convert 0-based index to 1-based option
+                if (ans >= 0 && ans <= 3) ans += 1;
+
+                if (ans >= 1 && ans <= 4) {
+                    questionStats[idx][ans]++;
+                    questionStats[idx].total++;
+                }
+            });
+        });
+
+        // Render container
+        let html = `
+            <div class="stat-card" style="border-left: 5px solid #9C27B0;">
+                <div class="stat-title" style="color: #9C27B0;">Photo Dokkai: Question Breakdown (Q50 - Q54)</div>
+                <p style="margin-bottom: 20px; color: var(--text-secondary);">Analysis of the most frequent correct option for each specific question number across all 15 chapters.</p>
+                <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 20px;">
+        `;
+
+        const questionLabels = ["Q50", "Q51", "Q52", "Q53", "Q54"];
+
+        questionStats.forEach((stats, idx) => {
+            const label = questionLabels[idx];
+            const total = stats.total;
+            const maxCount = Math.max(...Object.values(stats).slice(0, 4)); // Only check option counts
+
+            // Find best option
+            let bestOption = 1;
+            let maxVal = 0;
+            for (let i = 1; i <= 4; i++) {
+                if (stats[i] > maxVal) { maxVal = stats[i]; bestOption = i; }
+            }
+
+            html += `
+                <div style="background: var(--bg-color); padding: 15px; border-radius: 8px;">
+                    <h4 style="margin: 0 0 10px 0; border-bottom: 1px solid #ddd; padding-bottom: 5px;">
+                        ${label} <span style="font-weight: normal; font-size: 0.8em; color: #888">(${total} samples)</span>
+                    </h4>
+            `;
+
+            for (let i = 1; i <= 4; i++) {
+                const count = stats[i];
+                const pct = total > 0 ? ((count / total) * 100).toFixed(0) : 0;
+                const width = total > 0 ? ((count / total) * 100) : 0;
+
+                let color = '#ccc';
+                let fontWeight = 'normal';
+
+                if (count > 0 && count === maxVal) {
+                    color = '#4CAF50'; // Green for most frequent
+                    fontWeight = 'bold';
+                } else if (count > 0) {
+                    color = '#2196F3'; // Blue for presence
+                }
+
+                html += `
+                    <div style="display: flex; align-items: center; margin-bottom: 6px; font-size: 0.9em;">
+                        <span style="width: 20px; font-weight: bold; color: #666;">${i}</span>
+                        <div style="flex-grow: 1; background: #e0e0e0; height: 16px; border-radius: 4px; overflow: hidden;">
+                            <div style="width: ${width}%; background: ${color}; height: 100%;"></div>
+                        </div>
+                        <span style="width: 35px; text-align: right; margin-left: 5px; font-weight: ${fontWeight};">${count}</span>
+                    </div>
+                `;
+            }
+
+            html += `
+                <div style="margin-top: 5px; font-size: 0.85em; text-align: right; color: var(--text-secondary);">
+                    Most frequent: <strong>Option ${bestOption}</strong>
+                </div>
+                </div>
+            `;
+        });
+
+        html += `
+                </div>
+            </div>
+        `;
+
+        container.insertAdjacentHTML('beforeend', html);
+    }
+
+    analyzePhotoDokkai();
+
 });
