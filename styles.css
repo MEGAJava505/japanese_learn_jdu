@@ -353,9 +353,14 @@ input[type="number"] {
   width: 100%;
 }
 
-[id^="section-text_dokkai_"] .dokkai-wrapper,
-[id^="section-dokkai_"] .dokkai-wrapper {
+[id^="section-text_dokkai_"] .dokkai-wrapper {
   display: block !important;
+  width: 100%;
+}
+
+[id^="section-dokkai_"] .dokkai-wrapper {
+  display: flex !important;
+  /* Use flex for image/question split */
   width: 100%;
 }
 
