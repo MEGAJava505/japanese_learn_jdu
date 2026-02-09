@@ -524,6 +524,7 @@ function generateQuestions(mode, chapter) {
             photoTests.forEach((d, idx) => {
                 questions.push({
                     type: 'dokkai',
+                    title: `第${idx + 1}回`, // Add Chapter Title
                     image: d.image.replace('./dokkai_photo', 'data/dokkai_photo'),
                     questions: d.questions.map((q, qIdx) => ({
                         ...q,
@@ -594,9 +595,17 @@ function renderQuestions() {
             }
             bunpoCounter++;
         } else if (item.type === 'dokkai') {
-            sectionIdentifier = 'dokkai_section';
-            if (lastSectionType !== sectionIdentifier) {
-                headerText = '読解 (Reading Comprehension)';
+            if (item.title) {
+                // Specific title (e.g. 第1回 for Photo Dokkai)
+                sectionIdentifier = `dokkai_${item.title}`;
+                if (lastSectionType !== sectionIdentifier) {
+                    headerText = item.title;
+                }
+            } else {
+                sectionIdentifier = 'dokkai_section';
+                if (lastSectionType !== sectionIdentifier) {
+                    headerText = '読解 (Reading Comprehension)';
+                }
             }
         } else if (item.type === 'text_dokkai') {
             sectionIdentifier = `text_dokkai_${item.title}`;
