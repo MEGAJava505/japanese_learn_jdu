@@ -515,6 +515,27 @@ function generateQuestions(mode, chapter) {
         });
     }
 
+    // Photo Dokkai mode (15 photo-based dokkai tests)
+    if (mode === 'photo_dokkai') {
+        const photoTests = window.photoTests || [];
+
+        if (chapter === 'full') {
+            // All 15 photo dokkai
+            photoTests.forEach((d, idx) => {
+                questions.push({
+                    type: 'dokkai',
+                    image: d.image.replace('./dokkai_photo', 'data/dokkai_photo'),
+                    questions: d.questions.map((q, qIdx) => ({
+                        ...q,
+                        id: `photo_dokkai_${idx}_${qIdx}`,
+                        userAnswer: null,
+                        answer: q.correct
+                    }))
+                });
+            });
+        }
+    }
+
     // Sort combined questions? 
     // Usually standard test order: GOI -> BUNPO -> DOKKAI
     // The current push order ensures GOI first, then BUNPO, then DOKKAI.

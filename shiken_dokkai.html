@@ -51,13 +51,26 @@
                 <!-- Full Test (All Categories) -->
                 <div class="menu-card" style="padding: 0; overflow: hidden; border: 2px solid #E91E63;">
                     <div style="padding: 15px; text-align: center; background: rgba(233,30,99,0.1);">
-                        <h3 style="margin: 0; color: #F06292;">フルテスト (Full Test)</h3>
+                        <h3 style="margin: 0; color: #F06292;">ドリル フルテスト (Drill Full)</h3>
                         <p class="detail" style="margin: 5px 0 0 0;">All Categories: Easy → Medium → Hard → Table</p>
                     </div>
                     <div style="display: flex; height: 80px;">
                         <button onclick="startTestMode('dokkai_drill', 'full', false)"
-                            style="flex:1; cursor:pointer; background:#E91E63; color:white; border:none; font-size:1.3em; font-weight:bold;">Start
-                            Full Test</button>
+                            style="flex:1; cursor:pointer; background:#E91E63; color:white; border:none; font-size:1.3em; font-weight:bold;">Start</button>
+                    </div>
+                </div>
+
+                <!-- Photo Dokkai Full Test (15 chapters) -->
+                <div class="menu-card" style="padding: 0; overflow: hidden; border: 2px solid #9C27B0;">
+                    <div style="padding: 15px; text-align: center; background: rgba(156,39,176,0.1);">
+                        <h3 style="margin: 0; color: #BA68C8;">フォト読解 フル (Photo Full)</h3>
+                        <p class="detail" style="margin: 5px 0 0 0;">All 15 Photo Dokkai</p>
+                    </div>
+                    <div style="display: flex; height: 80px;">
+                        <button onclick="startTestMode('photo_dokkai', 'full', true)"
+                            style="flex:1; cursor:pointer; background:#4CAF50; color:white; border:none; font-size:1.3em; font-weight:bold;">Study</button>
+                        <button onclick="startTestMode('photo_dokkai', 'full', false)"
+                            style="flex:1; cursor:pointer; background:#9C27B0; color:white; border:none; font-size:1.3em; font-weight:bold;">Test</button>
                     </div>
                 </div>
 
