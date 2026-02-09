@@ -347,12 +347,14 @@ input[type="number"] {
 }
 
 /* Text Dokkai Drill Overrides - Force single column */
-[id^="section-text_dokkai_"] {
+[id^="section-text_dokkai_"],
+[id^="section-dokkai_"] {
   column-count: 1 !important;
   width: 100%;
 }
 
-[id^="section-text_dokkai_"] .dokkai-wrapper {
+[id^="section-text_dokkai_"] .dokkai-wrapper,
+[id^="section-dokkai_"] .dokkai-wrapper {
   display: block !important;
   width: 100%;
 }
