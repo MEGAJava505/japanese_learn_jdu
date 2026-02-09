@@ -79,7 +79,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     currentMode = urlParams.get('mode') || 'combined';
 
     const chParam = urlParams.get('chapter');
-    currentChapter = (chParam === 'random') ? 'random' : (parseInt(chParam) || 1);
+    currentChapter = (chParam === 'random' || chParam === 'full') ? chParam : (parseInt(chParam) || 1);
 
     // Study Mode Flag
     const studyParam = urlParams.get('study');
@@ -480,7 +480,17 @@ function generateQuestions(mode, chapter) {
         const textDokkai = (window.drillDokkaiQuestions) ? window.drillDokkaiQuestions : [];
 
         let filtered = [];
-        if (chapter === 'random') {
+        if (chapter === 'full') {
+            // Full Test: Group by difficulty, shuffle within groups, concatenate
+            const easy = textDokkai.filter(item => item.title.startsWith('1 ') || item.title.startsWith('2 '));
+            const medium = textDokkai.filter(item => item.title.startsWith('3 ') || item.title.startsWith('4 '));
+            const hard = textDokkai.filter(item => item.title.startsWith('5 '));
+            const table = textDokkai.filter(item => item.title.startsWith('6 '));
+
+            // Shuffle each group
+            const shuffle = arr => [...arr].sort(() => 0.5 - Math.random());
+            filtered = [...shuffle(easy), ...shuffle(medium), ...shuffle(hard), ...shuffle(table)];
+        } else if (chapter === 'random') {
             // Pick random 10 items
             const shuffled = [...textDokkai].sort(() => 0.5 - Math.random());
             filtered = shuffled.slice(0, 10);
@@ -884,14 +894,121 @@ function finishTest() {
     clearInterval(timerInterval);
 
     let total = 0;
+    let wrongAnswers = [];
+
     currentQuestions.forEach(q => {
-        if (q.type === 'dokkai') total += q.questions.length;
-        else if (q.type === 'text_dokkai') total += q.questions.length;
-        else total++;
+        if (q.type === 'dokkai') {
+            total += q.questions.length;
+        } else if (q.type === 'text_dokkai') {
+            total += q.questions.length;
+            // Collect wrong answers for review
+            q.questions.forEach((subQ, idx) => {
+                if (subQ.userAnswer !== null && subQ.userAnswer !== subQ.correct) {
+                    wrongAnswers.push({
+                        passage: q,
+                        questionIndex: idx,
+                        question: subQ
+                    });
+                }
+            });
+        } else {
+            total++;
+        }
     });
+
+    // Full Test mode: Show review if there are errors
+    if (currentMode === 'dokkai_drill' && currentChapter === 'full' && wrongAnswers.length > 0) {
+        showFullTestReview(wrongAnswers, score, total);
+        return;
+    }
 
     scoreDisplay.textContent = `Score: ${score} / ${total}`;
     resultModal.style.display = 'flex';
+}
+
+// Show error review screen for Full Test mode
+function showFullTestReview(wrongAnswers, finalScore, totalQuestions) {
+    // Hide normal result modal
+    resultModal.style.display = 'none';
+
+    // Create review container
+    const reviewContainer = document.createElement('div');
+    reviewContainer.id = 'fullTestReview';
+    reviewContainer.className = 'review-container';
+    reviewContainer.innerHTML = `
+        <div class="review-header">
+            <h2>結果: ${finalScore} / ${totalQuestions}</h2>
+            <p>間違えた問題 (${wrongAnswers.length}問)</p>
+            <button onclick="exitDrill()" class="exit-btn" style="margin-top: 10px;">戻る (Back)</button>
+        </div>
+        <div class="review-questions"></div>
+    `;
+
+    const questionsDiv = reviewContainer.querySelector('.review-questions');
+
+    // Group by passage
+    const passageMap = new Map();
+    wrongAnswers.forEach(item => {
+        const passageId = item.passage.id;
+        if (!passageMap.has(passageId)) {
+            passageMap.set(passageId, { passage: item.passage, questions: [] });
+        }
+        passageMap.get(passageId).questions.push(item);
+    });
+
+    // Render each passage with wrong questions
+    passageMap.forEach(({ passage, questions }) => {
+        const passageDiv = document.createElement('div');
+        passageDiv.className = 'review-passage';
+
+        // Passage text
+        let textHtml = passage.text.replace(/\n/g, '<br>');
+        textHtml = textHtml.replace(/（注\d+）/g, '<span class="annotation">$&</span>');
+        textHtml = textHtml.replace(/「([^」]+)」/g, '<span class="quoted">「$1」</span>');
+
+        passageDiv.innerHTML = `
+            <h3 class="review-passage-title">${passage.title}</h3>
+            <div class="review-passage-text">${textHtml}</div>
+            <div class="review-options-list"></div>
+        `;
+
+        const optionsList = passageDiv.querySelector('.review-options-list');
+
+        questions.forEach(item => {
+            const q = item.question;
+            const qDiv = document.createElement('div');
+            qDiv.className = 'review-question-item';
+            qDiv.innerHTML = `<p class="review-question-text">${q.text}</p>`;
+
+            const optionsDiv = document.createElement('div');
+            optionsDiv.className = 'review-options';
+            q.options.forEach((opt, idx) => {
+                const optBtn = document.createElement('div');
+                optBtn.className = 'review-option';
+                optBtn.textContent = `${idx + 1}. ${opt}`;
+
+                // Highlight correct answer in green
+                if (idx === q.correct) {
+                    optBtn.classList.add('review-correct');
+                }
+                // Highlight user's wrong answer in red
+                if (idx === q.userAnswer && q.userAnswer !== q.correct) {
+                    optBtn.classList.add('review-incorrect');
+                }
+
+                optionsDiv.appendChild(optBtn);
+            });
+            qDiv.appendChild(optionsDiv);
+            optionsList.appendChild(qDiv);
+        });
+
+        questionsDiv.appendChild(passageDiv);
+    });
+
+    // Clear main content and show review
+    questionList.innerHTML = '';
+    questionList.appendChild(reviewContainer);
+    window.scrollTo({ top: 0, behavior: 'smooth' });
 }
 
 // ===== FURIGANA HELPER =====
