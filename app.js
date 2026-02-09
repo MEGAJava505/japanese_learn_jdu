@@ -680,13 +680,8 @@ function renderQuestions() {
                 textDiv.innerText = item.text;
 
                 // Add click-to-zoom functionality
-                if (isStudyMode || currentMode === 'dokkai_drill') {
-                    textDiv.style.cursor = 'zoom-in';
-                    textDiv.onclick = (e) => {
-                        e.stopPropagation();
-                        showTextZoom(textDiv);
-                    };
-                }
+                // Disabled per user request (Main text should not zoom)
+
 
                 wrapper.appendChild(textDiv);
 
@@ -994,24 +989,17 @@ async function showTextZoom(element) {
             }
         };
 
-        // Styling for the "Zoomed" (Active) state - Popup style without overlay
-        element.style.position = 'fixed';
-        element.style.top = '50%';
-        element.style.left = '50%';
-        element.style.transform = 'translate(-50%, -50%)';
-        element.style.zIndex = '1000';
-        element.style.width = 'auto'; // Auto width
-        element.style.maxWidth = '90%';
-        element.style.maxHeight = '80vh';
-        element.style.overflowY = 'auto';
-        element.style.background = 'var(--surface-color)'; // Use theme color
-        element.style.padding = '20px';
-        element.style.boxShadow = '0 5px 20px rgba(0,0,0,0.3)'; // Lighter shadow
+        // Styling for "In-Place" Zoom: Scale only, no fixed position
+        element.style.position = 'relative';
+        element.style.zIndex = '100';
+        element.style.transform = 'scale(1.05)'; // Slight increase
+        element.style.boxShadow = '0 6px 16px rgba(0,0,0,0.15)';
+        element.style.transition = 'transform 0.2s ease, box-shadow 0.2s ease';
+        element.style.cursor = 'text';
+        // Ensure background is solid
+        element.style.background = 'var(--surface-color)';
         element.style.borderRadius = '8px';
         element.style.border = '1px solid var(--primary-color)';
-        // No font-size change per user request
-
-        // No font-size change per user request
 
         // Default logic for buttons (Options)
         if (!element.querySelector('.furigana-info')) {
@@ -1061,6 +1049,8 @@ function closeZoom(element) {
     element.style.boxShadow = '';
     element.style.border = '';
     element.style.borderRadius = '';
+    element.style.cursor = ''; // Reset cursor
+    element.style.transition = ''; // Reset transition
     element.onmouseup = null;
 
     // Also remove the Furigana Info if it was auto-added (for buttons)
