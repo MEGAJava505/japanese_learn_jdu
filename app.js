@@ -579,7 +579,8 @@ function renderQuestions() {
             }
         } else if (item.type === 'text_dokkai') {
             sectionIdentifier = `text_dokkai_${item.title}`;
-            if (lastSectionType !== sectionIdentifier) {
+            // Don't show category headers in Full Test mode (chapter === 'full')
+            if (lastSectionType !== sectionIdentifier && currentChapter !== 'full') {
                 headerText = item.title;
             }
         }
