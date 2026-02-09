@@ -224,7 +224,12 @@ function setupTest() {
             exitBtn.onclick = exitDrill;
             testTitle.appendChild(exitBtn);
         }
+
+        // Scroll to Top Button
+        createScrollTopBtn();
     }
+
+
 
     // Render
     renderQuestions();
@@ -1131,5 +1136,37 @@ function changeChapter(newChapter) {
     // Keep mode as study
     if (!urlParams.get('mode')) urlParams.set('mode', 'study');
     window.location.search = urlParams.toString();
+}
+
+function createScrollTopBtn() {
+    if (document.getElementById('scrollTopBtn')) return; // Avoid duplicates
+
+    const btn = document.createElement('button');
+    btn.id = 'scrollTopBtn';
+    btn.className = 'scroll-top-btn';
+    btn.innerHTML = '&uarr;'; // Up arrow
+    btn.title = 'Scroll to Top (上へ)';
+
+    // Add accessibility
+    btn.setAttribute('aria-label', 'Scroll to Top');
+
+    // Scroll event listener
+    window.addEventListener('scroll', () => {
+        if (window.scrollY > 300) {
+            btn.classList.add('visible');
+        } else {
+            btn.classList.remove('visible');
+        }
+    });
+
+    // Click event
+    btn.onclick = () => {
+        window.scrollTo({
+            top: 0,
+            behavior: 'smooth'
+        });
+    };
+
+    document.body.appendChild(btn);
 }
 
