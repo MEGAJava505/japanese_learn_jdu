@@ -678,6 +678,16 @@ function renderQuestions() {
                 }
 
                 textDiv.innerText = item.text;
+
+                // Add click-to-zoom functionality
+                if (isStudyMode || currentMode === 'dokkai_drill') {
+                    textDiv.style.cursor = 'zoom-in';
+                    textDiv.onclick = (e) => {
+                        e.stopPropagation();
+                        showTextZoom(textDiv);
+                    };
+                }
+
                 wrapper.appendChild(textDiv);
 
                 currentContainer.appendChild(wrapper);
@@ -720,9 +730,14 @@ function renderQuestions() {
 
                     btn.onclick = () => handleAnswer(q, optIdx, btn, optGrid);
 
-                    // Study Mode: ALWAYS show correct answer and disable
+                    // Study Mode: Interactive Zoom (don't disable)
                     if (isStudyMode || currentMode === 'study') {
-                        btn.disabled = true;
+                        // btn.disabled = true; // REMOVED to allow click-to-zoom
+                        btn.classList.add('study-option');
+                        btn.onclick = (e) => {
+                            e.stopPropagation();
+                            showTextZoom(btn);
+                        };
                         if (optIdx === q.answer) btn.classList.add('correct');
                     }
                     optGrid.appendChild(btn);
@@ -932,22 +947,79 @@ function finishTest() {
 })();
 
 // Text Zoom Helpers (Inline)
-async function showTextZoom(btn) {
-    if (btn && btn.classList) {
-        const isZoomed = btn.classList.toggle('zoomed-text');
+async function showTextZoom(element) {
+    // Close any other zoomed elements first
+    const currentZoomed = document.querySelector('.zoomed-text');
+    if (currentZoomed && currentZoomed !== element) {
+        closeZoom(currentZoomed);
+    }
 
-        // If zoomed in, fetch info if not present
-        if (isZoomed && !btn.querySelector('.furigana-info')) {
-            // Get text (remove number prefix if needed, e.g. "1. 食べる" -> "食べる")
-            let text = btn.textContent.trim();
-            // Remove "1. " or "2. " prefix
+    const isZoomed = element.classList.toggle('zoomed-text');
+
+    // Create overlay if not exists - REMOVED per user request
+    /*
+    let overlay = document.getElementById('zoomOverlay');
+    if (!overlay) { ... }
+    */
+
+    if (isZoomed) {
+        // overlay.style.display = 'block';
+
+        // Instructions for Furigana (Generic for all zoomed items)
+        /* REMOVED per user request
+        if (!element.querySelector('.zoom-instructions')) {
+             ...
+        }
+        */
+
+        // Add click-outside listener to close
+        const clickOutsideHandler = (e) => {
+            if (!element.contains(e.target) && !e.target.closest('#furiganaPopover')) {
+                closeZoom(element);
+                document.removeEventListener('mousedown', clickOutsideHandler);
+            }
+        };
+        // Delay adding listener to avoid immediate close
+        setTimeout(() => {
+            document.addEventListener('mousedown', clickOutsideHandler);
+        }, 50);
+
+        // Add selection listener for Furigana (works for both Text and Options)
+        element.onmouseup = async (e) => {
+            const selection = window.getSelection().toString().trim();
+            if (selection && selection.length > 0 && selection.length < 20) {
+                // Show popover
+                showFuriganaPopover(selection, e.clientX, e.clientY);
+                e.stopPropagation(); // Prevent other clicks
+            }
+        };
+
+        // Styling for the "Zoomed" (Active) state - Popup style without overlay
+        element.style.position = 'fixed';
+        element.style.top = '50%';
+        element.style.left = '50%';
+        element.style.transform = 'translate(-50%, -50%)';
+        element.style.zIndex = '1000';
+        element.style.width = 'auto'; // Auto width
+        element.style.maxWidth = '90%';
+        element.style.maxHeight = '80vh';
+        element.style.overflowY = 'auto';
+        element.style.background = 'var(--surface-color)'; // Use theme color
+        element.style.padding = '20px';
+        element.style.boxShadow = '0 5px 20px rgba(0,0,0,0.3)'; // Lighter shadow
+        element.style.borderRadius = '8px';
+        element.style.border = '1px solid var(--primary-color)';
+        // No font-size change per user request
+
+        // No font-size change per user request
+
+        // Default logic for buttons (Options)
+        if (!element.querySelector('.furigana-info')) {
+            let text = element.textContent.trim();
             text = text.replace(/^\d+\.\s*/, '');
-            // Also need to be careful with existing HTML structure if any, but btn usually has text + maybe some spans?
-            // Actually btn.innerHTML was set as `${optIdx + 1}. ${opt}`
-            // So textContent is safe. But if we already added .furigana-info, we shouldn't be here (checked above).
 
-            // Show loading placeholder?
-            // Maybe just wait.
+            // Limit length for API safety
+            if (text.length > 30) return;
 
             const result = await fetchReading(text);
             if (result) {
@@ -965,9 +1037,74 @@ async function showTextZoom(btn) {
                 infoDiv.appendChild(readingDiv);
                 infoDiv.appendChild(meaningDiv);
 
-                btn.appendChild(infoDiv);
+                element.appendChild(infoDiv);
             }
         }
+    } else {
+        closeZoom(element);
+    }
+}
+
+function closeZoom(element) {
+    element.classList.remove('zoomed-text');
+    element.style.position = '';
+    element.style.top = '';
+    element.style.left = '';
+    element.style.transform = '';
+    element.style.zIndex = '';
+    element.style.width = '';
+    element.style.maxWidth = '';
+    element.style.maxHeight = '';
+    element.style.overflowY = '';
+    element.style.background = '';
+    element.style.padding = '';
+    element.style.boxShadow = '';
+    element.style.border = '';
+    element.style.borderRadius = '';
+    element.onmouseup = null;
+
+    // Also remove the Furigana Info if it was auto-added (for buttons)
+    const info = element.querySelector('.furigana-info');
+    if (info) info.remove();
+}
+
+// Helper for Furigana Popover
+async function showFuriganaPopover(text, x, y) {
+    let popover = document.getElementById('furiganaPopover');
+    if (!popover) {
+        popover = document.createElement('div');
+        popover.id = 'furiganaPopover';
+        popover.style.position = 'fixed';
+        popover.style.background = 'var(--surface-color)';
+        popover.style.border = '1px solid var(--primary-color)';
+        popover.style.padding = '10px';
+        popover.style.borderRadius = '8px';
+        popover.style.boxShadow = '0 4px 12px rgba(0,0,0,0.2)';
+        popover.style.zIndex = '1001';
+        popover.style.maxWidth = '300px';
+        document.body.appendChild(popover);
+
+        // Close on click outside
+        document.addEventListener('mousedown', (e) => {
+            if (popover.style.display === 'block' && !popover.contains(e.target)) {
+                popover.style.display = 'none';
+            }
+        });
+    }
+
+    popover.innerHTML = '<div style="text-align:center;">Loading...</div>';
+    popover.style.left = `${x}px`;
+    popover.style.top = `${y + 15}px`;
+    popover.style.display = 'block';
+
+    const result = await fetchReading(text);
+    if (result) {
+        popover.innerHTML = `
+            <div style="color:var(--primary-color); font-weight:bold; font-size:1.2em; margin-bottom:4px;">${result.reading}</div>
+            <div style="font-size:0.9em; line-height:1.4;">${result.meanings}</div>
+        `;
+    } else {
+        popover.innerHTML = '<div style="color:var(--error-color);">No definition found</div>';
     }
 }
 
