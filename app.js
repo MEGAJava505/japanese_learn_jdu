@@ -723,7 +723,11 @@ function renderQuestions() {
                         // Feedback is seemingly delayed in Test Mode.
                     }
 
-                    btn.onclick = () => handleAnswer(q, optIdx, btn, optGrid);
+                    // Add selection check to onclick handlers
+                    btn.onclick = (e) => {
+                        if (q.userAnswer != null) return; // Prevent changing answer if already selected
+                        handleAnswer(q, optIdx, btn, optGrid);
+                    };
 
                     // Study Mode: Interactive Zoom (don't disable)
                     if (isStudyMode || currentMode === 'study') {

@@ -639,36 +639,33 @@ input[type="number"] {
 }
 
 /* Text Zoom (Inline) */
+/* Text Zoom (Inline) */
 .option-btn.zoomed-text {
-  font-size: 1.5rem !important;
-  /* Make text larger */
-  line-height: 1.6;
-  padding: 20px;
+  /* No font-size change per user request */
+  /* font-size: 1.5rem !important; REMOVED */
   background-color: var(--surface-color);
-  z-index: 10;
+  z-index: 100;
   position: relative;
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
-  transform: scale(1.02);
+  box-shadow: 0 6px 16px rgba(0, 0, 0, 0.15);
+  transform: scale(1.05);
   /* Slight pop */
   white-space: normal;
-  /* Ensure text wraps if needed */
   display: flex;
   flex-direction: column;
   justify-content: center;
-  align-items: center;
-  gap: 12px;
+  gap: 8px;
+  border-color: var(--primary-color);
 }
 
 .furigana-info {
-  font-size: 1rem;
+  font-size: 0.9rem;
   font-weight: normal;
   color: var(--text-secondary);
   border-top: 1px solid var(--surface-hover);
-  padding-top: 10px;
+  padding-top: 8px;
   width: 100%;
-  animation: fadeIn 0.3s ease-out;
+  animation: fadeIn 0.2s ease-out;
   display: none;
-  /* Hidden by default */
   flex-direction: column;
   gap: 4px;
 }
@@ -679,13 +676,13 @@ input[type="number"] {
 }
 
 .furigana-reading {
-  font-size: 1.2rem;
+  font-size: 1rem;
   color: var(--primary-color);
   font-weight: bold;
 }
 
 .furigana-meaning {
-  font-size: 0.9rem;
+  font-size: 0.85rem;
   color: var(--text-primary);
   opacity: 0.9;
   line-height: 1.4;
@@ -693,17 +690,21 @@ input[type="number"] {
 
 /* Study mode interactive option styles */
 .study-option {
-  cursor: zoom-in !important;
+  cursor: pointer !important;
+  /* Was zoom-in */
   transition: all 0.2s ease-out;
 }
 
 .study-option.zoomed-text {
-  cursor: zoom-out !important;
+  cursor: text !important;
+  /* Was zoom-out */
 }
 
 /* Mobile adjustments for Zoom */
 @media (max-width: 600px) {
   .option-btn.zoomed-text {
-    font-size: 1.3rem !important;
+    /* font-size: 1.3rem !important; REMOVED */
+    transform: scale(1.02);
+    /* Less scale on mobile */
   }
 }
