@@ -430,7 +430,7 @@ window.photoTests = [
     ]
   },
   {
-    image: "./dokkai_photo/n2dokkai_photo/15.png",
+    image: "./dokkai_photo/n2dokkai_photo/015.png",
     questions: [
       {
         text: "50 番 の下の空所を埋めなさい。",

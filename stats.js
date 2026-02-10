@@ -213,6 +213,10 @@ document.addEventListener('DOMContentLoaded', () => {
         renderSection(`Simulated Shiken - Bunpo Part (Q33-49) <span style="font-size:0.8em">[${simBunpo.length} Qs]</span>`, simBunpo);
         renderSection(`Simulated Shiken - Dokkai Part (Q50-54) <span style="font-size:0.8em">[${simDokkai.length} Qs]</span>`, simDokkai);
 
+        // No Photo Dokkai Aggregate (Q1-49)
+        const noPhotoSim = [...simGoi, ...simBunpo];
+        renderSection(`Simulated Shiken - No Photo Dokkai (Q1-49) <span style="font-size:0.8em; color:var(--secondary-color)">[Monte Carlo: ${noPhotoSim.length} Qs]</span>`, noPhotoSim);
+
         // Overall Aggregate
         const allSim = [...simGoi, ...simBunpo, ...simDokkai];
         renderSection(`Simulated Shiken - Full Test (Aggregated) <span style="font-size:0.8em; color:var(--primary-color)">[Monte Carlo: ${state_questions_count()} Qs]</span>`, allSim);
